@@ -17,11 +17,67 @@ class App extends Component {
     cartList: [],
   }
 
+  removeCartItem = id => {
+    console.log(id)
+    this.setState(prv => ({
+      cartList: prv.cartList.filter(each => each.id !== id),
+    }))
+  }
+
+  reduceCount = id => {
+    const {cartList} = this.state
+    const item = cartList.find(each => each.id === id)
+    if (item.quantity === 1) {
+      this.setState(prv => ({
+        cartList: prv.cartList.filter(each => each.id !== id),
+      }))
+    } else {
+      item.quantity -= 1
+      this.setState({cartList: [...cartList, item]})
+    }
+  }
+
+  increment = id => {
+    this.setState(prv => ({
+      cartList: prv.cartList.map(each => {
+        if (each.id === id) {
+          return {...each, quantity: each.quantity + 1}
+        }
+        return each
+      }),
+    }))
+  }
+
+  decrement = id => {
+    this.setState(prv => ({
+      cartList: prv.cartList.map(each => {
+        if (each.id === id && each.quantity > 1) {
+          return {...each, quantity: each.quantity - 1}
+        }
+        return each
+      }),
+    }))
+  }
+
   //   TODO: Add your code for remove all cart items, increment cart item quantity, decrement cart item quantity, remove cart item
 
   addCartItem = product => {
-    this.setState(prevState => ({cartList: [...prevState.cartList, product]}))
-    //   TODO: Update the code here to implement addCartItem
+    const {cartList} = this.state
+    const item = cartList.find(each => each.id === product.id)
+
+    if (item !== undefined) {
+      const newQuantity = item.quantity + product.quantity
+      this.setState(prv => ({
+        cartList: prv.cartList.map(each => {
+          if (each.id === product.id) {
+            return {...each, quantity: newQuantity}
+          }
+          return each
+        }),
+      }))
+    } else {
+      this.setState(prevState => ({cartList: [...prevState.cartList, product]}))
+    }
   }
 
   render() {
@@ -33,6 +89,8 @@ class App extends Component {
           cartList,
           addCartItem: this.addCartItem,
           removeCartItem: this.removeCartItem,
+          incrementCartItemQuantity: this.increment,
+          decrementCartItemQuantity: this.decrement,
         }}
       >
         <Switch>
